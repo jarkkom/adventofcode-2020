@@ -4,34 +4,34 @@ use std::fs::File;
 use std::path::Path;
 use std::env;
 
-fn read_input(filename: &str) -> Vec<i64> {
+fn read_input(filename: &str) -> Result<Vec<i64>, String> {
     let path = Path::new(filename);
-
-    println!("{:?}", path);
-
     let file = File::open(path);
-
-    println!("{:?}", file);
-
     let reader = BufReader::new(file.unwrap());
 
     let mut output = Vec::new();
-
     for line_iter in reader.lines() {
-        let intval: i64 = line_iter.unwrap().parse().unwrap();
-        output.push(intval);
+        match line_iter {
+            Ok(x) => {
+                match x.parse::<i64>() {
+                    Ok(num) => output.push(num),
+                    Err(err) => return Err(format!("invalid number {:?}, {:?}", x, err)),
+                }
+                output.push(x.parse().unwrap());
+            }
+            Err(x) => {
+                return Err(format!("cannot read input: {:?}", x));
+            }
+        }
     }
 
-    return output;
+    return Ok(output);
 }
 
 fn find_sum(inputs: &Vec<i64>) -> i64 {
-    for i in 0..inputs.len() {
-        for j in i + 1..inputs.len() {
-            for k in i + 1..inputs.len() {
-                let a = inputs.get(i).unwrap();
-                let b = inputs.get(j).unwrap();
-                let c = inputs.get(k).unwrap();
+    for (i, a) in inputs.iter().enumerate() {
+        for (j, b) in inputs.iter().skip(i).enumerate() {
+            for c in inputs.iter().skip(i + j) {
                 if a + b + c == 2020 {
                     println!("{} + {} + {} = {} -> {}", a, b, c, a + b + c, a * b * c);
                     return a * b * c;
@@ -47,11 +47,10 @@ fn main() {
 
     let filename = args.get(1).unwrap();
 
-    println!("{}", filename);
-
-    let inputs = read_input(&filename);
-
-    find_sum(&inputs);
+    match read_input(&filename) {
+        Ok(inputs) => println!("sum is {}", find_sum(&inputs)),
+        Err(err) => println!("could not parse input {:?}", err),
+    }
 }
 
 #[cfg(test)]
