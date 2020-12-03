@@ -44,22 +44,12 @@ fn read_input(filename: &str) -> Result<Vec<Input>, String> {
     return Ok(output);
 }
 
-fn validate_inputs(inputs: &Vec<Input>) -> i64 {
-    let mut valids = 0;
-    for i in inputs.iter() {
-        let mut count = 0;
-        let chars: Vec<char> = i.password.chars().collect();
-        if chars[i.pos1 - 1] == i.letter {
-            count += 1;
-        }
-        if chars[i.pos2 - 1] == i.letter {
-            count += 1;
-        }
-        if count == 1 {
-            valids += 1;
-        }
-    }
-    return valids;
+fn validate_inputs(inputs: Vec<Input>) -> i64 {
+    return inputs.iter().fold(0, |valids: i64, i: &Input| -> i64 {
+        let c1 = i.password.chars().skip(i.pos1 - 1).next().unwrap();
+        let c2 = i.password.chars().skip(i.pos2 - 1).next().unwrap();
+        if (c1 == i.letter) ^ (c2 == i.letter) { return valids + 1 } else { return valids };
+    });
 }
 
 fn main() {
@@ -68,7 +58,7 @@ fn main() {
     let filename = args.get(1).unwrap();
 
     match read_input(&filename) {
-        Ok(inputs) => println!("valid password: {}", validate_inputs(&inputs)),
+        Ok(inputs) => println!("valid password: {}", validate_inputs(inputs)),
         Err(err) => println!("could not parse input {:?}", err),
     }
 }
@@ -99,6 +89,6 @@ mod tests {
                 password: "ccccccccc".to_owned(),
             },
         ];
-        assert_eq!(validate_inputs(&test_inputs), 1);
+        assert_eq!(validate_inputs(test_inputs), 1);
     }
 }
