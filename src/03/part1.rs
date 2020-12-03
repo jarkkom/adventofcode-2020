@@ -49,12 +49,14 @@ fn read_input(filename: &str) -> Result<Map, String> {
 fn count_trees(map: Map) -> i64 {
     let mut trees = 0;
 
+    let mut y = 0;
     let mut x = 0;
-    for y in 0..map.height {
+    while y < map.height {
         if map.trees[y * map.width + x] {
             trees += 1;
         }
         x = (x + 3) % map.width;
+        y += 1;
     }
     return trees;
 }
@@ -68,7 +70,7 @@ fn main() {
 
     println!("map {:?} {:?} {:?}", map.width, map.height, map.trees);
 
-    println!("tress {:?} ", count_trees(map));
+    println!("trees {:?} ", count_trees(map));
 }
 
 #[cfg(test)]
@@ -78,9 +80,9 @@ mod tests {
     #[test]
     fn test_count_trees() {
         let test_map = Map {
-            width: 66,
+            width: 11,
             height: 11,
-            trees: vec![false, false, true, true, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, true, false, false, false, true, false, false, false, true, false, false, true, false, false, false, true, false, false, false, true, false, false, true, false, false, false, true, false, false, false, true, false, false, true, false, false, false, true, false, false, false, true, false, false, true, false, false, false, true, false, false, false, true, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, false, true, false, false, true, false, false, true, false, false, false, false, true, false, false, true, false, false, true, false, false, false, false, true, false, false, true, false, false, true, false, false, false, false, true, false, false, true, false, false, true, false, false, false, false, true, false, false, true, false, false, true, false, false, false, false, true, false, false, true, false, false, false, true, false, true, false, false, false, true, false, true, false, false, true, false, true, false, false, false, true, false, true, false, false, true, false, true, false, false, false, true, false, true, false, false, true, false, true, false, false, false, true, false, true, false, false, true, false, true, false, false, false, true, false, true, false, false, true, false, true, false, false, false, true, false, true, false, true, false, false, false, true, true, false, false, true, false, false, true, false, false, false, true, true, false, false, true, false, false, true, false, false, false, true, true, false, false, true, false, false, true, false, false, false, true, true, false, false, true, false, false, true, false, false, false, true, true, false, false, true, false, false, true, false, false, false, true, true, false, false, true, false, false, false, true, false, true, true, false, false, false, false, false, false, false, true, false, true, true, false, false, false, false, false, false, false, true, false, true, true, false, false, false, false, false, false, false, true, false, true, true, false, false, false, false, false, false, false, true, false, true, true, false, false, false, false, false, false, false, true, false, true, true, false, false, false, false, false, false, true, false, true, false, true, false, false, false, false, true, false, true, false, true, false, true, false, false, false, false, true, false, true, false, true, false, true, false, false, false, false, true, false, true, false, true, false, true, false, false, false, false, true, false, true, false, true, false, true, false, false, false, false, true, false, true, false, true, false, true, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, true, true, false, true, true, false, false, false, true, false, false, false, true, false, true, true, false, false, false, true, false, false, false, true, false, true, true, false, false, false, true, false, false, false, true, false, true, true, false, false, false, true, false, false, false, true, false, true, true, false, false, false, true, false, false, false, true, false, true, true, false, false, false, true, false, false, false, true, false, false, false, true, true, false, false, false, false, true, true, false, false, false, true, true, false, false, false, false, true, true, false, false, false, true, true, false, false, false, false, true, true, false, false, false, true, true, false, false, false, false, true, true, false, false, false, true, true, false, false, false, false, true, true, false, false, false, true, true, false, false, false, false, true, false, true, false, false, true, false, false, false, true, false, true, false, true, false, false, true, false, false, false, true, false, true, false, true, false, false, true, false, false, false, true, false, true, false, true, false, false, true, false, false, false, true, false, true, false, true, false, false, true, false, false, false, true, false, true, false, true, false, false, true, false, false, false, true, false, true],
+            trees: vec![false, false, true, true, false, false, false, false, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, false, true, false, false, true, false, false, false, true, false, true, false, false, false, true, false, true, false, true, false, false, false, true, true, false, false, true, false, false, false, true, false, true, true, false, false, false, false, false, false, true, false, true, false, true, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, true, true, false, true, true, false, false, false, true, false, false, false, true, false, false, false, true, true, false, false, false, false, true, false, true, false, false, true, false, false, false, true, false, true],
         };
         
         assert_eq!(count_trees(test_map), 7);
