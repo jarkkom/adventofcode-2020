@@ -1,3 +1,5 @@
+use std::io;
+use std::io::Read;
 use std::io::BufRead;
 use std::io::BufReader;
 use std::fs::File;
@@ -6,11 +8,13 @@ use std::env;
 use std::collections::HashMap;
 use regex::Regex;
 
-
-fn read_input(filename: &str) -> Result<Vec<HashMap<String, String>>, String> {
+fn open_input(filename: &str) -> io::Result<File> {
     let path = Path::new(filename);
-    let file = File::open(path);
-    let reader = BufReader::new(file.unwrap());
+    return File::open(path);
+}
+
+fn read_input(reader: impl Read) -> Result<Vec<HashMap<String, String>>, String> {
+    let reader = BufReader::new(reader);
 
     let mut passports: Vec<HashMap<String, String>> = Vec::new();
     let mut curr_passport = HashMap::new();
@@ -126,7 +130,8 @@ fn main() {
 
     let filename = args.get(1).unwrap();
 
-    let passports = read_input(&filename).unwrap();
+    let input_file = open_input(&filename);
+    let passports = read_input(input_file.unwrap()).unwrap();
 
     println!("valid passports {:?} ", count_valid_passports(passports));
     
@@ -135,6 +140,24 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_input_reader() {
+        let test_input = "ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
+byr:1937 iyr:2017 cid:147 hgt:183cm";
+        let output = read_input(test_input.as_bytes()).unwrap();
+        assert_eq!(output.len(), 1);
+        let passport = output.first().unwrap();
+        assert_eq!(passport.len(), 8);
+        assert_eq!(passport["ecl"], "gry");
+        assert_eq!(passport["pid"], "860033327");
+        assert_eq!(passport["eyr"], "2020");
+        assert_eq!(passport["hcl"], "#fffffd");
+        assert_eq!(passport["byr"], "1937");
+        assert_eq!(passport["iyr"], "2017");
+        assert_eq!(passport["cid"], "147");
+        assert_eq!(passport["hgt"], "183cm");
+    }
 
     #[test]
     fn test_valid_height() {
