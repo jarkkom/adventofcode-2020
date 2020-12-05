@@ -1,12 +1,12 @@
+use regex::Regex;
+use std::collections::HashMap;
+use std::env;
+use std::fs::File;
 use std::io;
-use std::io::Read;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::fs::File;
+use std::io::Read;
 use std::path::Path;
-use std::env;
-use std::collections::HashMap;
-use regex::Regex;
 
 fn open_input(filename: &str) -> io::Result<File> {
     let path = Path::new(filename);
@@ -47,19 +47,18 @@ fn read_input(reader: impl Read) -> Result<Vec<HashMap<String, String>>, String>
 
 fn is_number_in_range(num: &str, min: i64, max: i64) -> bool {
     let n: i64 = num.parse().unwrap_or_default();
-    if n < min || n > max { 
+    if n < min || n > max {
         println!("invalid {:?} not in {}-{}", num, min, max);
         return false;
     }
     return true;
 }
 
-
 fn is_valid_height(hgt: &str) -> bool {
     let hgt_re = Regex::new(r"^(\d+)(cm|in)$").unwrap();
     if let Some(hgt_capt) = hgt_re.captures(hgt) {
         if hgt_capt.len() != 3 {
-            return false
+            return false;
         };
 
         let vs = hgt_capt.get(1).map_or("", |m| m.as_str());
@@ -134,7 +133,6 @@ fn main() {
     let passports = read_input(input_file.unwrap()).unwrap();
 
     println!("valid passports {:?} ", count_valid_passports(passports));
-    
 }
 
 #[cfg(test)]

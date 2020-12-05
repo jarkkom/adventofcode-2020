@@ -1,9 +1,9 @@
+use regex::Regex;
+use std::env;
+use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::fs::File;
 use std::path::Path;
-use std::env;
-use regex::Regex;
 
 struct Input {
     pos1: usize,
@@ -31,7 +31,7 @@ fn read_input(filename: &str) -> Result<Vec<Input>, String> {
                         letter: m[3].chars().next().unwrap(),
                         password: m[4].to_owned(),
                     };
-    
+
                     output.push(i);
                 }
             }
@@ -48,7 +48,11 @@ fn validate_inputs(inputs: Vec<Input>) -> i64 {
     return inputs.iter().fold(0, |valids: i64, i: &Input| -> i64 {
         let c1 = i.password.chars().skip(i.pos1 - 1).next().unwrap();
         let c2 = i.password.chars().skip(i.pos2 - 1).next().unwrap();
-        if (c1 == i.letter) ^ (c2 == i.letter) { return valids + 1 } else { return valids };
+        if (c1 == i.letter) ^ (c2 == i.letter) {
+            return valids + 1;
+        } else {
+            return valids;
+        };
     });
 }
 
@@ -71,20 +75,20 @@ mod tests {
     fn test_validate_inputs() {
         let test_inputs: Vec<Input> = vec![
             Input {
-                pos1: 1, 
-                pos2: 3, 
+                pos1: 1,
+                pos2: 3,
                 letter: 'a',
                 password: "abcde".to_owned(),
             },
             Input {
-                pos1: 1, 
-                pos2: 3, 
+                pos1: 1,
+                pos2: 3,
                 letter: 'b',
                 password: "cdefg".to_owned(),
             },
             Input {
-                pos1: 2, 
-                pos2: 9, 
+                pos1: 2,
+                pos2: 9,
                 letter: 'c',
                 password: "ccccccccc".to_owned(),
             },

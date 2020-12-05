@@ -1,13 +1,13 @@
+use std::env;
+use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::fs::File;
 use std::path::Path;
-use std::env;
 
 struct Map {
     width: usize,
     height: usize,
-    trees: Vec<bool>
+    trees: Vec<bool>,
 }
 
 fn read_input(filename: &str) -> Result<Map, String> {
@@ -39,7 +39,7 @@ fn read_input(filename: &str) -> Result<Map, String> {
         }
     }
 
-    return Ok(Map{
+    return Ok(Map {
         width: max_width,
         height: height,
         trees: trees,
@@ -73,7 +73,15 @@ fn main() {
     let t3 = count_trees(5, 1, &map);
     let t4 = count_trees(7, 1, &map);
     let t5 = count_trees(1, 2, &map);
-    println!("{} * {} * {} * {} * {} = {}", t1, t2, t3, t4, t5, t1 * t2 * t3 * t4 * t5);
+    println!(
+        "{} * {} * {} * {} * {} = {}",
+        t1,
+        t2,
+        t3,
+        t4,
+        t5,
+        t1 * t2 * t3 * t4 * t5
+    );
 }
 
 #[cfg(test)]
@@ -85,9 +93,21 @@ mod tests {
         let test_map = Map {
             width: 11,
             height: 11,
-            trees: vec![false, false, true, true, false, false, false, false, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, false, true, false, false, true, false, false, false, true, false, true, false, false, false, true, false, true, false, true, false, false, false, true, true, false, false, true, false, false, false, true, false, true, true, false, false, false, false, false, false, true, false, true, false, true, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, true, true, false, true, true, false, false, false, true, false, false, false, true, false, false, false, true, true, false, false, false, false, true, false, true, false, false, true, false, false, false, true, false, true],
+            trees: vec![
+                false, false, true, true, false, false, false, false, false, false, false, true,
+                false, false, false, true, false, false, false, true, false, false, false, true,
+                false, false, false, false, true, false, false, true, false, false, false, true,
+                false, true, false, false, false, true, false, true, false, true, false, false,
+                false, true, true, false, false, true, false, false, false, true, false, true,
+                true, false, false, false, false, false, false, true, false, true, false, true,
+                false, false, false, false, true, false, true, false, false, false, false, false,
+                false, false, false, true, true, false, true, true, false, false, false, true,
+                false, false, false, true, false, false, false, true, true, false, false, false,
+                false, true, false, true, false, false, true, false, false, false, true, false,
+                true,
+            ],
         };
-        
+
         assert_eq!(count_trees(1, 1, &test_map), 2);
         assert_eq!(count_trees(3, 1, &test_map), 7);
         assert_eq!(count_trees(5, 1, &test_map), 3);

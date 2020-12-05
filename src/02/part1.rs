@@ -1,9 +1,9 @@
+use regex::Regex;
+use std::env;
+use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::fs::File;
 use std::path::Path;
-use std::env;
-use regex::Regex;
 
 struct Input {
     min: i64,
@@ -31,7 +31,7 @@ fn read_input(filename: &str) -> Result<Vec<Input>, String> {
                         letter: m[3].chars().next().unwrap(),
                         password: m[4].to_owned(),
                     };
-    
+
                     output.push(i);
                 }
             }
@@ -79,20 +79,20 @@ mod tests {
     fn test_validate_inputs() {
         let test_inputs: Vec<Input> = vec![
             Input {
-                min: 1, 
-                max: 3, 
+                min: 1,
+                max: 3,
                 letter: 'a',
                 password: "abcde".to_owned(),
             },
             Input {
-                min: 1, 
-                max: 3, 
+                min: 1,
+                max: 3,
                 letter: 'b',
                 password: "cdefg".to_owned(),
             },
             Input {
-                min: 2, 
-                max: 9, 
+                min: 2,
+                max: 9,
                 letter: 'c',
                 password: "ccccccccc".to_owned(),
             },
