@@ -61,10 +61,9 @@ fn main() {
     let input_file = open_input(&filename);
     let passes = read_input(input_file.unwrap()).unwrap();
 
-    let mut max_seat_id = 0;
-    for p in passes {
-        max_seat_id = cmp::max(max_seat_id, get_seat_id(&p));
-    }
+    let max_seat_id = passes.iter().fold(0, |curr_max, pass| {
+        return cmp::max(curr_max, get_seat_id(&pass));
+    });
     println!("max seat id {}", max_seat_id);
 }
 

@@ -61,18 +61,14 @@ fn main() {
     let input_file = open_input(&filename);
     let passes = read_input(input_file.unwrap()).unwrap();
 
-    let mut seat_ids = Vec::new();
-    for p in passes {
-        seat_ids.push(get_seat_id(&p));
-    }
+    let mut seat_ids: Vec<i64> = passes.iter()
+        .map(|pass| return get_seat_id(&pass)).collect();
+
     seat_ids.sort();
 
-    for i in seat_ids.windows(2) {
-        if i[1] - i[0] > 1 {
-            println!("{:?}", i);
-        }
-    }
-
+    println!("{:?}", seat_ids.windows(2)
+        .filter(|ids| return ids[1] - ids[0] > 1)
+        .next());
 }
 
 #[cfg(test)]
