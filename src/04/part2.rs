@@ -10,7 +10,7 @@ use std::path::Path;
 
 fn open_input(filename: &str) -> io::Result<File> {
     let path = Path::new(filename);
-    return File::open(path);
+    File::open(path)
 }
 
 fn read_input(reader: impl Read) -> Result<Vec<HashMap<String, String>>, String> {
@@ -23,7 +23,7 @@ fn read_input(reader: impl Read) -> Result<Vec<HashMap<String, String>>, String>
         match line_iter {
             Ok(x) => {
                 if x.is_empty() {
-                    passports.push(curr_passport.to_owned());
+                    passports.push(curr_passport);
                     curr_passport = HashMap::new();
                 } else {
                     for field in x.split_ascii_whitespace() {
@@ -38,11 +38,11 @@ fn read_input(reader: impl Read) -> Result<Vec<HashMap<String, String>>, String>
             }
         }
     }
-    if curr_passport.len() > 0 {
-        passports.push(curr_passport.to_owned());
+    if !curr_passport.is_empty() {
+        passports.push(curr_passport);
     }
 
-    return Ok(passports);
+    Ok(passports)
 }
 
 fn is_number_in_range(num: &str, min: i64, max: i64) -> bool {
@@ -51,7 +51,7 @@ fn is_number_in_range(num: &str, min: i64, max: i64) -> bool {
         println!("invalid {:?} not in {}-{}", num, min, max);
         return false;
     }
-    return true;
+    true
 }
 
 fn is_valid_height(hgt: &str) -> bool {
@@ -74,23 +74,23 @@ fn is_valid_height(hgt: &str) -> bool {
         }
     }
     println!("invalid height {:?}", hgt);
-    return false;
+    false
 }
 
 fn is_valid_hcl(color: &str) -> bool {
     let re = Regex::new(r"^#[0-9a-f]{6}$").unwrap();
-    return re.is_match(color);
+    re.is_match(color)
 }
 
 fn is_valid_ecl(color: &str) -> bool {
     let mandatory_fields = vec!["amb", "blu", "brn", "gry", "grn", "hzl", "oth"];
 
-    return mandatory_fields.contains(&color);
+    mandatory_fields.contains(&color)
 }
 
 fn is_valid_pid(pid: &str) -> bool {
     let re = Regex::new(r"^[0-9]{9}$").unwrap();
-    return re.is_match(pid);
+    re.is_match(pid)
 }
 
 fn count_valid_passports(passports: Vec<HashMap<String, String>>) -> i64 {
@@ -121,7 +121,7 @@ fn count_valid_passports(passports: Vec<HashMap<String, String>>) -> i64 {
             valids += 1;
         }
     }
-    return valids;
+    valids
 }
 
 fn main() {

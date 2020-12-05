@@ -41,19 +41,19 @@ fn read_input(filename: &str) -> Result<Vec<Input>, String> {
         }
     }
 
-    return Ok(output);
+    Ok(output)
 }
 
 fn validate_inputs(inputs: Vec<Input>) -> i64 {
-    return inputs.iter().fold(0, |valids: i64, i: &Input| -> i64 {
-        let c1 = i.password.chars().skip(i.pos1 - 1).next().unwrap();
-        let c2 = i.password.chars().skip(i.pos2 - 1).next().unwrap();
+    inputs.iter().fold(0, |valids: i64, i: &Input| -> i64 {
+        let c1 = i.password.chars().nth(i.pos1 - 1).unwrap();
+        let c2 = i.password.chars().nth(i.pos2 - 1).unwrap();
         if (c1 == i.letter) ^ (c2 == i.letter) {
-            return valids + 1;
+            valids + 1
         } else {
-            return valids;
-        };
-    });
+            valids
+        }
+    })
 }
 
 fn main() {
