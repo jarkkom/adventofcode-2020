@@ -25,10 +25,10 @@ fn read_input(filename: &str) -> Result<Vec<i64>, String> {
         }
     }
 
-    return Ok(output);
+    Ok(output)
 }
 
-fn find_sum(inputs: &Vec<i64>) -> i64 {
+fn find_sum(inputs: &[i64]) -> i64 {
     for (i, a) in inputs.iter().enumerate() {
         for b in inputs.iter().skip(i) {
             if a + b == 2020 {
@@ -37,7 +37,7 @@ fn find_sum(inputs: &Vec<i64>) -> i64 {
             }
         }
     }
-    return -1;
+    -1
 }
 
 fn main() {

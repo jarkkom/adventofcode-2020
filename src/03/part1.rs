@@ -39,11 +39,11 @@ fn read_input(filename: &str) -> Result<Map, String> {
         }
     }
 
-    return Ok(Map {
+    Ok(Map {
         width: max_width,
-        height: height,
-        trees: trees,
-    });
+        height,
+        trees,
+    })
 }
 
 fn count_trees(map: Map) -> i64 {
@@ -58,7 +58,7 @@ fn count_trees(map: Map) -> i64 {
         x = (x + 3) % map.width;
         y += 1;
     }
-    return trees;
+    trees
 }
 
 fn main() {

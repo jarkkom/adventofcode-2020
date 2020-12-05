@@ -41,10 +41,10 @@ fn read_input(filename: &str) -> Result<Vec<Input>, String> {
         }
     }
 
-    return Ok(output);
+    Ok(output)
 }
 
-fn validate_inputs(inputs: &Vec<Input>) -> i64 {
+fn validate_inputs(inputs: &[Input]) -> i64 {
     let mut valids = 0;
     for i in inputs.iter() {
         let mut count: i64 = 0;
@@ -57,7 +57,7 @@ fn validate_inputs(inputs: &Vec<Input>) -> i64 {
             valids += 1;
         }
     }
-    return valids;
+    valids
 }
 
 fn main() {

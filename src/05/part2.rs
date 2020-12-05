@@ -8,7 +8,7 @@ use std::path::Path;
 
 fn open_input(filename: &str) -> io::Result<File> {
     let path = Path::new(filename);
-    return File::open(path);
+    File::open(path)
 }
 
 fn read_input(reader: impl Read) -> Result<Vec<String>, String> {
@@ -27,23 +27,23 @@ fn read_input(reader: impl Read) -> Result<Vec<String>, String> {
         }
     }
 
-    return Ok(lines);
+    Ok(lines)
 }
 
-fn parse_row(pass: &String) -> i64 {
+fn parse_row(pass: &str) -> i64 {
     return pass.chars().take(7).fold(0, |v, x| {
-        return (v << 1) + if x == 'B' { 1 } else { 0 };
+        (v << 1) + if x == 'B' { 1 } else { 0 }
     });
 }
 
-fn parse_column(pass: &String) -> i64 {
+fn parse_column(pass: &str) -> i64 {
     return pass.chars().skip(7).take(3).fold(0, |v, x| {
-        return (v << 1) + if x == 'R' { 1 } else { 0 };
+        (v << 1) + if x == 'R' { 1 } else { 0 }
     });
 }
 
-fn get_seat_id(pass: &String) -> i64 {
-    return parse_row(&pass) * 8 + parse_column(&pass);
+fn get_seat_id(pass: &str) -> i64 {
+    parse_row(&pass) * 8 + parse_column(&pass)
 }
 
 fn main() {
@@ -56,17 +56,16 @@ fn main() {
 
     let mut seat_ids: Vec<i64> = passes
         .iter()
-        .map(|pass| return get_seat_id(&pass))
+        .map(|pass| get_seat_id(&pass))
         .collect();
 
-    seat_ids.sort();
+    seat_ids.sort_unstable();
 
     println!(
         "{:?}",
         seat_ids
             .windows(2)
-            .filter(|ids| return ids[1] - ids[0] > 1)
-            .next()
+            .find(|ids| ids[1] - ids[0] > 1)
     );
 }
 
