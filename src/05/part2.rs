@@ -5,7 +5,6 @@ use std::io::BufReader;
 use std::fs::File;
 use std::path::Path;
 use std::env;
-use std::cmp;
 
 fn open_input(filename: &str) -> io::Result<File> {
     let path = Path::new(filename);
