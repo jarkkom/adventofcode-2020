@@ -31,21 +31,15 @@ fn read_input(reader: impl Read) -> Result<Vec<String>, String> {
 }
 
 fn parse_row(pass: &String) -> i64 {
-    let mut v = 0;
-    for x in pass.chars().take(7) {
-        v <<= 1;
-        v += if x == 'B' { 1 } else { 0 };
-    }
-    return v;
+    return pass.chars().take(7).fold(0, |v, x| {
+        return (v << 1) + if x == 'B' { 1 } else { 0 };
+    });
 }
 
 fn parse_column(pass: &String) -> i64 {
-    let mut v = 0;
-    for x in pass.chars().skip(7).take(3) {
-        v <<= 1;
-        v += if x == 'R' { 1 } else { 0 };
-    }
-    return v;
+    return pass.chars().skip(7).take(3).fold(0, |v, x| {
+        return (v << 1) + if x == 'R' { 1 } else { 0 };
+    });
 }
 
 fn get_seat_id(pass: &String) -> i64 {
