@@ -1,8 +1,8 @@
+use std::env;
+use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::fs::File;
 use std::path::Path;
-use std::env;
 
 fn read_input(filename: &str) -> Result<Vec<i64>, String> {
     let path = Path::new(filename);

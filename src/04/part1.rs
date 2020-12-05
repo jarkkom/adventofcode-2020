@@ -1,11 +1,11 @@
+use std::collections::HashMap;
+use std::env;
+use std::fs::File;
 use std::io;
-use std::io::Read;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::fs::File;
+use std::io::Read;
 use std::path::Path;
-use std::env;
-use std::collections::HashMap;
 
 fn open_input(filename: &str) -> io::Result<File> {
     let path = Path::new(filename);
@@ -73,7 +73,6 @@ fn main() {
     let passports = read_input(input_file.unwrap()).unwrap();
 
     println!("valid passports {:?} ", count_valid_passports(passports));
-    
 }
 
 #[cfg(test)]
@@ -99,6 +98,5 @@ byr:1937 iyr:2017 cid:147 hgt:183cm";
     }
 
     #[test]
-    fn test_count_valid_passports() {
-    }
+    fn test_count_valid_passports() {}
 }

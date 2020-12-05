@@ -1,10 +1,10 @@
+use std::env;
+use std::fs::File;
 use std::io;
-use std::io::Read;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::fs::File;
+use std::io::Read;
 use std::path::Path;
-use std::env;
 
 fn open_input(filename: &str) -> io::Result<File> {
     let path = Path::new(filename);
@@ -54,14 +54,20 @@ fn main() {
     let input_file = open_input(&filename);
     let passes = read_input(input_file.unwrap()).unwrap();
 
-    let mut seat_ids: Vec<i64> = passes.iter()
-        .map(|pass| return get_seat_id(&pass)).collect();
+    let mut seat_ids: Vec<i64> = passes
+        .iter()
+        .map(|pass| return get_seat_id(&pass))
+        .collect();
 
     seat_ids.sort();
 
-    println!("{:?}", seat_ids.windows(2)
-        .filter(|ids| return ids[1] - ids[0] > 1)
-        .next());
+    println!(
+        "{:?}",
+        seat_ids
+            .windows(2)
+            .filter(|ids| return ids[1] - ids[0] > 1)
+            .next()
+    );
 }
 
 #[cfg(test)]
@@ -88,5 +94,4 @@ mod tests {
         assert_eq!(get_seat_id(&String::from("FFFBBBFRRR")), 119);
         assert_eq!(get_seat_id(&String::from("BBFFBBFRLL")), 820);
     }
-
 }

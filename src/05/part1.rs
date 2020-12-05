@@ -1,11 +1,11 @@
+use std::cmp;
+use std::env;
+use std::fs::File;
 use std::io;
-use std::io::Read;
 use std::io::BufRead;
 use std::io::BufReader;
-use std::fs::File;
+use std::io::Read;
 use std::path::Path;
-use std::env;
-use std::cmp;
 
 fn open_input(filename: &str) -> io::Result<File> {
     let path = Path::new(filename);
@@ -85,5 +85,4 @@ mod tests {
         assert_eq!(get_seat_id(&String::from("FFFBBBFRRR")), 119);
         assert_eq!(get_seat_id(&String::from("BBFFBBFRLL")), 820);
     }
-
 }
