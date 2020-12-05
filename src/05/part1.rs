@@ -32,15 +32,18 @@ fn read_input(reader: impl Read) -> Result<Vec<String>, String> {
 }
 
 fn parse_row(pass: &str) -> i64 {
-    return pass.chars().take(7).fold(0, |v, x| {
-        (v << 1) + if x == 'B' { 1 } else { 0 }
-    });
+    return pass
+        .chars()
+        .take(7)
+        .fold(0, |v, x| (v << 1) + if x == 'B' { 1 } else { 0 });
 }
 
 fn parse_column(pass: &str) -> i64 {
-    return pass.chars().skip(7).take(3).fold(0, |v, x| {
-        (v << 1) + if x == 'R' { 1 } else { 0 }
-    });
+    return pass
+        .chars()
+        .skip(7)
+        .take(3)
+        .fold(0, |v, x| (v << 1) + if x == 'R' { 1 } else { 0 });
 }
 
 fn get_seat_id(pass: &str) -> i64 {
@@ -55,9 +58,9 @@ fn main() {
     let input_file = open_input(&filename);
     let passes = read_input(input_file.unwrap()).unwrap();
 
-    let max_seat_id = passes.iter().fold(0, |curr_max, pass| {
-        cmp::max(curr_max, get_seat_id(&pass))
-    });
+    let max_seat_id = passes
+        .iter()
+        .fold(0, |curr_max, pass| cmp::max(curr_max, get_seat_id(&pass)));
     println!("max seat id {}", max_seat_id);
 }
 
