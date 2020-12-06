@@ -60,10 +60,7 @@ fn read_input(reader: impl Read) -> Result<Vec<Group>, String> {
 
 fn count_answers(groups: Vec<Group>) -> usize {
     groups.iter().fold(0, |total, g| {
-        total
-            + g.answers.iter().fold(0, |answers_all_yes, (_k, v)| {
-                answers_all_yes + if *v == g.people { 1 } else { 0 }
-            })
+        total + g.answers.values().filter(|&&v| v == g.people).count()
     })
 }
 
