@@ -18,29 +18,23 @@ struct Group {
     answers: HashMap<char, usize>,
 }
 
-fn read_input(reader: impl Read) -> Result<Vec<Group>, String> {
+fn read_input(reader: impl Read) -> Result<Vec<Vec<i64>>, String> {
     let reader = BufReader::new(reader);
 
-    let mut groups: Vec<Group> = Vec::new();
-    let mut curr_group_answers = HashMap::new();
-
-    let mut curr_people = 0;
+    let mut groups: Vec<Vec<i64>> = Vec::new();
+    let mut curr_group: Vec<i64> = Vec::new();
 
     for line_iter in reader.lines() {
         match line_iter {
             Ok(x) => {
                 if x.is_empty() {
-                    groups.push(Group {
-                        answers: curr_group_answers,
-                        people: curr_people,
-                    });
-                    curr_group_answers = HashMap::new();
-                    curr_people = 0;
+                    groups.push(curr_group);
+                    curr_group = Vec::new();
                 } else {
-                    for c in x.chars() {
-                        curr_group_answers.insert(c, curr_group_answers.get(&c).unwrap_or(&0) + 1);
-                    }
-                    curr_people += 1;
+                    curr_group.push(
+                        x.chars()
+                            .fold(0, |set, c| set | 1 << (c as u32 - 'a' as u32)),
+                    );
                 }
             }
             Err(x) => {
@@ -48,19 +42,19 @@ fn read_input(reader: impl Read) -> Result<Vec<Group>, String> {
             }
         }
     }
-    if !curr_group_answers.is_empty() {
-        groups.push(Group {
-            answers: curr_group_answers,
-            people: curr_people,
-        });
+    if !curr_group.is_empty() {
+        groups.push(curr_group);
     }
 
     Ok(groups)
 }
 
-fn count_answers(groups: Vec<Group>) -> usize {
-    groups.iter().fold(0, |total, g| {
-        total + g.answers.values().filter(|&&v| v == g.people).count()
+fn count_answers(groups: Vec<Vec<i64>>) -> u32 {
+    groups.iter().fold(0, |c, passengers| {
+        c + passengers
+            .iter()
+            .fold(i64::MAX, |union, p| union & p)
+            .count_ones()
     })
 }
 
@@ -101,24 +95,16 @@ b";
 
         let group = output.first().unwrap();
 
-        assert_eq!(group.people, 1);
-        assert_eq!(group.answers.len(), 3);
+        assert_eq!(group.len(), 1);
 
-        println!("{:?}", group);
-
-        assert_eq!(group.answers.get(&'a').unwrap(), &1);
-        assert_eq!(group.answers.get(&'b').unwrap(), &1);
-        assert_eq!(group.answers.get(&'c').unwrap(), &1);
+        assert_eq!(group[0], 1 | 2 | 4);
 
         let group3 = output.iter().nth(2).unwrap();
-        println!("{:?}", group3);
 
-        assert_eq!(group3.people, 2);
-        assert_eq!(group3.answers.len(), 3);
+        assert_eq!(group3.len(), 2);
 
-        assert_eq!(group3.answers.get(&'a').unwrap(), &2);
-        assert_eq!(group3.answers.get(&'b').unwrap(), &1);
-        assert_eq!(group3.answers.get(&'c').unwrap(), &1);
+        assert_eq!(group3[0], 1 | 2);
+        assert_eq!(group3[1], 1 | 4);
     }
 
     #[test]
