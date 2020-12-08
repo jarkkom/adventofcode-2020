@@ -28,7 +28,7 @@ struct CPU {
 fn parse_opcode(s: &str) -> Option<Opcode> {
     let mut i = s.split_whitespace();
 
-    Some(Opcode{
+    Some(Opcode {
         instr: i.next().unwrap().to_owned(),
         oper: i.next().unwrap().parse().unwrap(),
     })
@@ -94,13 +94,12 @@ fn main() {
     let opcodes = read_input(input_file.unwrap()).unwrap();
     println!("{:?}", opcodes);
 
-    let mut cpu = CPU{
+    let mut cpu = CPU {
         ip: 0,
         inst: opcodes,
         acc: 0,
         debug: true,
     };
-
 
     let mut executed: Vec<usize> = vec![];
     loop {
@@ -134,15 +133,42 @@ acc +6";
         println!("{:?}", output);
 
         let expected = vec![
-            Opcode{instr: String::from("nop"), oper: 0},
-            Opcode{instr: String::from("acc"), oper: 1},
-            Opcode{instr: String::from("jmp"), oper: 4},
-            Opcode{instr: String::from("acc"), oper: 3},
-            Opcode{instr: String::from("jmp"), oper: -3},
-            Opcode{instr: String::from("acc"), oper: -99},
-            Opcode{instr: String::from("acc"), oper: 1},
-            Opcode{instr: String::from("jmp"), oper: -4},
-            Opcode{instr: String::from("acc"), oper: 6},
+            Opcode {
+                instr: String::from("nop"),
+                oper: 0,
+            },
+            Opcode {
+                instr: String::from("acc"),
+                oper: 1,
+            },
+            Opcode {
+                instr: String::from("jmp"),
+                oper: 4,
+            },
+            Opcode {
+                instr: String::from("acc"),
+                oper: 3,
+            },
+            Opcode {
+                instr: String::from("jmp"),
+                oper: -3,
+            },
+            Opcode {
+                instr: String::from("acc"),
+                oper: -99,
+            },
+            Opcode {
+                instr: String::from("acc"),
+                oper: 1,
+            },
+            Opcode {
+                instr: String::from("jmp"),
+                oper: -4,
+            },
+            Opcode {
+                instr: String::from("acc"),
+                oper: 6,
+            },
         ];
         assert_eq!(output, expected);
     }
@@ -160,24 +186,24 @@ jmp -4
 acc +6";
         let opcodes = read_input(test_input.as_bytes()).unwrap();
 
-        let mut cpu = CPU{
+        let mut cpu = CPU {
             ip: 0,
             inst: opcodes,
             acc: 0,
             debug: true,
         };
-    
+
         /*
-0 nop +0  | 1
-1 acc +1  | 2, 8(!)
-2 jmp +4  | 3
-3 acc +3  | 6
-4 jmp -3  | 7
-5 acc -99 |
-6 acc +1  | 4
-7 jmp -4  | 5
-8 acc +6  |
-*/        
+        0 nop +0  | 1
+        1 acc +1  | 2, 8(!)
+        2 jmp +4  | 3
+        3 acc +3  | 6
+        4 jmp -3  | 7
+        5 acc -99 |
+        6 acc +1  | 4
+        7 jmp -4  | 5
+        8 acc +6  |
+        */
 
         assert_eq!(cpu.ip, 0);
         assert_eq!(cpu.execute(), 1);
@@ -195,11 +221,21 @@ acc +6";
 
     #[test]
     fn test_parse_rule() {
-        let opcode1 =
-            parse_opcode("someinstr +12345").unwrap();
-        assert_eq!(opcode1, Opcode{instr: String::from("someinstr"), oper: 12345});
-        let opcode2 =
-            parse_opcode("another -12345").unwrap();
-        assert_eq!(opcode2, Opcode{instr: String::from("another"), oper: -12345});
+        let opcode1 = parse_opcode("someinstr +12345").unwrap();
+        assert_eq!(
+            opcode1,
+            Opcode {
+                instr: String::from("someinstr"),
+                oper: 12345
+            }
+        );
+        let opcode2 = parse_opcode("another -12345").unwrap();
+        assert_eq!(
+            opcode2,
+            Opcode {
+                instr: String::from("another"),
+                oper: -12345
+            }
+        );
     }
 }
