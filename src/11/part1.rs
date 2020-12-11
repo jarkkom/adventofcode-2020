@@ -1,10 +1,10 @@
 use std::env;
 use std::fs::File;
+use std::io;
 use std::io::BufRead;
 use std::io::BufReader;
 use std::io::Read;
 use std::path::Path;
-use std::io;
 
 fn open_input(filename: &str) -> io::Result<File> {
     let path = Path::new(filename);
@@ -24,14 +24,18 @@ impl Seats {
             //println!("oob {} {}", x, y);
             return 0;
         }
-    
+
         let i = y as usize * self.width + x as usize;
 
         //println!("map {} {} {} [{}]", x, y, self.seats[i], i);
 
-        return if self.seats[i] > 1 { 1 } else { 0 }
+        if self.seats[i] > 1 {
+            1
+        } else {
+            0
+        }
     }
-    
+
     fn apply_rules(&self) -> Seats {
         let mut new_seats = Vec::new();
         for y in 0..self.height {
@@ -42,22 +46,22 @@ impl Seats {
                     new_seats.push(curr_state);
                     continue;
                 }
-    
+
                 let mut occupieds = 0;
                 let ix = x as i64;
                 let iy = y as i64;
 
                 occupieds += self.is_occupied(ix - 1, iy - 1);
-                occupieds += self.is_occupied(ix + 0, iy - 1);
+                occupieds += self.is_occupied(ix, iy - 1);
                 occupieds += self.is_occupied(ix + 1, iy - 1);
-    
-                occupieds += self.is_occupied(ix - 1, iy + 0);
-                occupieds += self.is_occupied(ix + 1, iy + 0);
-    
+
+                occupieds += self.is_occupied(ix - 1, iy);
+                occupieds += self.is_occupied(ix + 1, iy);
+
                 occupieds += self.is_occupied(ix - 1, iy + 1);
-                occupieds += self.is_occupied(ix + 0, iy + 1);
+                occupieds += self.is_occupied(ix, iy + 1);
                 occupieds += self.is_occupied(ix + 1, iy + 1);
-    
+
                 if curr_state == 1 && occupieds == 0 {
                     new_seats.push(2);
                 } else if curr_state == 2 && occupieds >= 4 {
@@ -67,7 +71,7 @@ impl Seats {
                 }
             }
         }
-        Seats{
+        Seats {
             width: self.width,
             height: self.height,
             seats: new_seats,
@@ -148,7 +152,10 @@ fn main() {
     curr_state.print();
     println!("iterations {}", iterations);
 
-    println!("occupied {}", curr_state.seats.iter().filter(|s| **s == 2).count());
+    println!(
+        "occupied {}",
+        curr_state.seats.iter().filter(|s| **s == 2).count()
+    );
 }
 
 #[cfg(test)]
@@ -156,7 +163,8 @@ mod tests {
     use super::*;
 
     fn get_test_data() -> String {
-        return String::from("L.LL.LL.LL
+        return String::from(
+            "L.LL.LL.LL
 LLLLLLL.LL
 L.L.L..L..
 LLLL.LL.LL
@@ -165,27 +173,22 @@ L.LLLLL.LL
 ..L.L.....
 LLLLLLLLLL
 L.LLLLLL.L
-L.LLLLL.LL");
+L.LLLLL.LL",
+        );
     }
 
     #[test]
     fn test_read_input() {
         let map = read_input(get_test_data().as_bytes()).unwrap();
 
-        let expected = Seats{
+        let expected = Seats {
             width: 10,
             height: 10,
             seats: vec![
-                1,0,1,1,0,1,1,0,1,1,
-                1,1,1,1,1,1,1,0,1,1,
-                1,0,1,0,1,0,0,1,0,0,
-                1,1,1,1,0,1,1,0,1,1,
-                1,0,1,1,0,1,1,0,1,1,
-                1,0,1,1,1,1,1,0,1,1,
-                0,0,1,0,1,0,0,0,0,0,
-                1,1,1,1,1,1,1,1,1,1,
-                1,0,1,1,1,1,1,1,0,1,
-                1,0,1,1,1,1,1,0,1,1,
+                1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1,
+                0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1,
+                1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+                1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1,
             ],
         };
 
@@ -196,8 +199,14 @@ L.LLLLL.LL");
 
     #[test]
     fn test_is_occupied() {
-        let init_map = read_input(String::from(".#
-L#").as_bytes()).unwrap();
+        let init_map = read_input(
+            String::from(
+                ".#
+L#",
+            )
+            .as_bytes(),
+        )
+        .unwrap();
 
         assert_eq!(init_map.is_occupied(-1, -1), 0);
         assert_eq!(init_map.is_occupied(-1, 0), 0);
@@ -209,17 +218,24 @@ L#").as_bytes()).unwrap();
         assert_eq!(init_map.is_occupied(1, 1), 1);
 
         assert_eq!(init_map.is_occupied(init_map.width as i64, 0), 0);
-        assert_eq!(init_map.is_occupied(init_map.width as i64, init_map.height as i64), 0);
-        assert_eq!(init_map.is_occupied(init_map.width as i64, init_map.height as i64), 0);
+        assert_eq!(
+            init_map.is_occupied(init_map.width as i64, init_map.height as i64),
+            0
+        );
+        assert_eq!(
+            init_map.is_occupied(init_map.width as i64, init_map.height as i64),
+            0
+        );
     }
-
 
     #[test]
     fn test_apply_rules() {
         let init_map = read_input(get_test_data().as_bytes()).unwrap();
         init_map.print();
 
-        let expected_1 = read_input(String::from("#.##.##.##
+        let expected_1 = read_input(
+            String::from(
+                "#.##.##.##
 #######.##
 #.#.#..#..
 ####.##.##
@@ -229,14 +245,19 @@ L#").as_bytes()).unwrap();
 ##########
 #.######.#
 #.#####.##
-").as_bytes()).unwrap();
-
+",
+            )
+            .as_bytes(),
+        )
+        .unwrap();
 
         let actual_1 = init_map.apply_rules();
         actual_1.print();
         assert_eq!(expected_1, actual_1);
 
-        let expected_2 = read_input(String::from("#.LL.L#.##
+        let expected_2 = read_input(
+            String::from(
+                "#.LL.L#.##
 #LLLLLL.L#
 L.L.L..L..
 #LLL.LL.L#
@@ -246,13 +267,19 @@ L.L.L..L..
 #LLLLLLLL#
 #.LLLLLL.L
 #.#LLLL.##
-").as_bytes()).unwrap();
+",
+            )
+            .as_bytes(),
+        )
+        .unwrap();
 
         let actual_2 = actual_1.apply_rules();
         actual_2.print();
         assert_eq!(expected_2, actual_2);
 
-        let expected_3 = read_input(String::from("#.##.L#.##
+        let expected_3 = read_input(
+            String::from(
+                "#.##.L#.##
 #L###LL.L#
 L.#.#..#..
 #L##.##.L#
@@ -262,13 +289,19 @@ L.#.#..#..
 #L######L#
 #.LL###L.L
 #.#L###.##
-").as_bytes()).unwrap();
+",
+            )
+            .as_bytes(),
+        )
+        .unwrap();
 
         let actual_3 = actual_2.apply_rules();
         actual_3.print();
         assert_eq!(expected_3, actual_3);
 
-        let expected_4 = read_input(String::from("#.#L.L#.##
+        let expected_4 = read_input(
+            String::from(
+                "#.#L.L#.##
 #LLL#LL.L#
 L.L.L..#..
 #LLL.##.L#
@@ -278,13 +311,19 @@ L.L.L..#..
 #L#LLLL#L#
 #.LLLLLL.L
 #.#L#L#.##
-").as_bytes()).unwrap();
+",
+            )
+            .as_bytes(),
+        )
+        .unwrap();
 
         let actual_4 = actual_3.apply_rules();
         actual_4.print();
         assert_eq!(expected_4, actual_4);
 
-        let expected_5 = read_input(String::from("#.#L.L#.##
+        let expected_5 = read_input(
+            String::from(
+                "#.#L.L#.##
 #LLL#LL.L#
 L.#.L..#..
 #L##.##.L#
@@ -294,7 +333,11 @@ L.#.L..#..
 #L#L##L#L#
 #.LLLLLL.L
 #.#L#L#.##
-").as_bytes()).unwrap();
+",
+            )
+            .as_bytes(),
+        )
+        .unwrap();
 
         let actual_5 = actual_4.apply_rules();
         actual_5.print();
@@ -302,5 +345,4 @@ L.#.L..#..
 
         assert_eq!(actual_5.seats.iter().filter(|s| **s == 2).count(), 37);
     }
-
 }
