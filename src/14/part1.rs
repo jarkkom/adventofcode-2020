@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use regex::Regex;
+use std::collections::HashMap;
 use std::env;
 use std::fs::File;
 use std::io;
@@ -50,11 +50,11 @@ impl CPU {
             match c {
                 '0' => {
                     self.mask0 |= 1;
-                },
+                }
                 '1' => {
                     self.mask1 |= 1;
-                },
-                _ => {},
+                }
+                _ => {}
             }
         }
 
@@ -92,7 +92,7 @@ impl CPU {
     }
 
     fn mem_sum(&self) -> i64 {
-        self.mem.values().fold(0, |a, m| a + m)
+        self.mem.values().sum()
     }
 }
 
@@ -115,7 +115,6 @@ fn main() {
     }
 
     println!("answer = {}", cpu.mem_sum());
-
 }
 
 #[cfg(test)]

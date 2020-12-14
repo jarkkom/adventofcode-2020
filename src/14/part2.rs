@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use regex::Regex;
+use std::collections::HashMap;
 use std::env;
 use std::fs::File;
 use std::io;
@@ -53,52 +53,35 @@ impl CPU {
             match c {
                 '0' => {
                     self.mask0 |= 1;
-                },
+                }
                 '1' => {
                     self.mask1 |= 1;
-                },
+                }
                 'X' => {
                     self.maskx |= 1;
-                },
-                _ => {},
+                }
+                _ => {}
             }
         }
 
         println!("set_mask {} {:36b} {:36b}", mask, self.mask0, self.mask1);
     }
 
-    fn set_mem(&mut self, maskx: i64, loc: i64, val: i64) {
-        /*
-        println!("set_met");
-        println!("loc   {:64b}", loc);
-        println!("maskx {:64b}", maskx);
-        */
+    fn set_mem(&mut self, loc: i64, val: i64) {
+        let mut addrs = vec![loc | self.mask1];
 
-        let mem = loc | self.mask1;
-
-        if self.maskx != 0 {
-            for x in 0..36 {
-                //println!("testing {:36b} against {:36b}", maskx, (1 as i64) << x);
-                if (maskx & (1 << x)) != 0 {
-                    let newmask = maskx & !(1 << x);
-                    //println!("floating bit at {} maskx {:36b}", x, newmask);
-
-                    let mem0 = mem & !(1 << x);
-                    let mem1 = mem & !(1 << x) | 1 << x;
-
-                    //println!("setting memory {:36b} {}", mem0, mem0);
-                    self.mem.insert(mem0, val);
-
-                    //println!("setting memory {:36b} {}", mem1, mem1);
-                    self.mem.insert(mem1, val);
-
-                    self.set_mem(newmask, loc & !(1 << x), val);
-                    self.set_mem(newmask, loc & !(1 << x) | 1 << x, val);
+        for x in 0..36 {
+            if (self.maskx & (1 << x)) != 0 {
+                let mut newaddrs = vec![];
+                for a in &addrs {
+                    newaddrs.push(a & !(1 << x));
+                    newaddrs.push(a & !(1 << x) | 1 << x);
                 }
+                addrs = newaddrs;
             }
-        } else {
-            //println!("setting memory {:36b}", mem);
-            self.mem.insert(mem, val);
+        }
+        for a in addrs {
+            self.mem.insert(a, val);
         }
     }
 
@@ -117,12 +100,12 @@ impl CPU {
             let loc = caps.get(1).unwrap().as_str().parse().unwrap();
             let val = caps.get(2).unwrap().as_str().parse().unwrap();
 
-            self.set_mem(self.maskx, loc, val);
+            self.set_mem(loc, val);
         }
     }
 
     fn mem_sum(&self) -> i64 {
-        self.mem.values().fold(0, |a, m| a + m)
+        self.mem.values().sum()
     }
 }
 
@@ -198,5 +181,13 @@ mem[26] = 1";
         assert_eq!(cpu.mem[&27], 1);
 
         assert_eq!(cpu.mem_sum(), 208);
+
+        /*
+                cpu.execute("mask = 00000X0X0000000000000000000000X1001X");
+                let before = std::time::Instant::now();
+                cpu.execute(&inputs[3]);
+                let after = std::time::Instant::now();
+                println!("{:?}", after - before);
+        */
     }
 }
