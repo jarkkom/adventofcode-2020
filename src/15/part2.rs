@@ -12,7 +12,7 @@ impl MemoryGame {
     fn new(starting_numbers: Vec<i64>) -> Self {
         Self {
             turn: 0,
-            starting_numbers: starting_numbers.clone(),
+            starting_numbers,
             last_seen: HashMap::new(),
             previous: -1,
         }
@@ -26,12 +26,12 @@ impl Iterator for MemoryGame {
         self.turn += 1;
 
         if self.turn > 30000000 {
-            return None
+            return None;
         }
 
         let speaking;
 
-        if self.starting_numbers.len() > 0 {
+        if !self.starting_numbers.is_empty() {
             // speak a starting number
             speaking = self.starting_numbers.remove(0);
         } else if self.last_seen.contains_key(&self.previous) {
@@ -45,12 +45,12 @@ impl Iterator for MemoryGame {
         self.last_seen.insert(self.previous, self.turn - 1);
         self.previous = speaking;
 
-        return Some(speaking)
+        Some(speaking)
     }
 }
 
 fn main() {
-    let game = MemoryGame::new(vec![16,1,0,18,12,14,19]);
+    let game = MemoryGame::new(vec![16, 1, 0, 18, 12, 14, 19]);
     println!("30000000th {:?}", game.last());
 }
 
@@ -60,10 +60,10 @@ mod tests {
 
     #[test]
     fn test_iterator() {
-        let starting_numbers: Vec<i64> = vec![0,3,6];
+        let starting_numbers: Vec<i64> = vec![0, 3, 6];
 
         let mut game = MemoryGame::new(starting_numbers);
-        
+
         println!("{:?}", game);
         // Turn 1: The 1st number spoken is a starting number, 0.
         assert_eq!(game.next(), Some(0));
