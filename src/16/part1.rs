@@ -143,9 +143,9 @@ fn read_input(reader: impl Read) -> Result<(Vec<Rule>, Vec<i64>, Vec<Vec<i64>>),
                     if x.is_empty() {
                         break;
                     }
-    
+
                     tickets.push(x.split(',').map(|x| x.parse().unwrap()).collect());
-    
+
                     println!("{:?}", x);
                 }
                 Err(x) => {
@@ -157,7 +157,6 @@ fn read_input(reader: impl Read) -> Result<(Vec<Rule>, Vec<i64>, Vec<Vec<i64>>),
         }
     }
     Ok((rules, own_tickets[0].to_vec(), tickets))
-
 }
 
 fn validate_ticket(ticket: &Vec<i64>, rules: &Vec<Rule>) -> Option<i64> {
@@ -192,12 +191,13 @@ fn main() {
 
     println!("tickets {:?}", tickets);
 
-    let validated_tickets: Vec<Option<i64>> = tickets.iter().map(|t| 
-        validate_ticket(&t, &rules)).collect();
-    println!("validations {:?}", validated_tickets);
+    let validated_tickets: Vec<Option<i64>> = tickets
+        .iter()
+        .map(|t| validate_ticket(&t, &rules))
+        .collect();
+    println!("validated_tickets {:?}", validated_tickets);
 
     println!("answer {:?}", calculate_error_rate(validated_tickets));
-
 }
 
 #[cfg(test)]
@@ -298,5 +298,5 @@ seat: 13-40 or 45-50
         let validated_tickets = tickets.iter().map(|x| validate_ticket(x, &rules)).collect();
 
         assert_eq!(calculate_error_rate(validated_tickets), 71);
-    }    
+    }
 }
