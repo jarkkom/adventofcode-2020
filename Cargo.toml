@@ -128,3 +128,7 @@ path = "src/15/part2.rs"
 [[bin]]
 name = "16-01"
 path = "src/16/part1.rs"
+
+[[bin]]
+name = "16-02"
+path = "src/16/part2.rs"
