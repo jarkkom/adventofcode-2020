@@ -18,12 +18,12 @@ struct Cubes {
 }
 
 impl Cubes {
-    fn get_index(x: i64, y: i64, z: i64) -> i64 {
-        (x + 512) << 20 | (y + 512) << 10 | (z + 512)
+    fn get_index(x: i64, y: i64, z: i64, w: i64) -> i64 {
+        (x + 512) << 30 | (y + 512) << 20 | (z + 512) << 10 | (w + 512)
     }
 
-    fn is_occupied(&self, x: i64, y: i64, z: i64) -> i64 {
-        if self.active.contains(&Cubes::get_index(x, y, z)) {
+    fn is_occupied(&self, x: i64, y: i64, z: i64, w: i64) -> i64 {
+        if self.active.contains(&Cubes::get_index(x, y, z, w)) {
             1
         } else {
             0
@@ -36,25 +36,30 @@ impl Cubes {
         for x in -area..area + 1 {
             for y in -area..area + 1 {
                 for z in -area..area + 1 {
-                    let this_occupied = self.is_occupied(x, y, z);
+                    for w in -area..area + 1 {
+                        let this_occupied = self.is_occupied(x, y, z, w);
 
-                    let mut occupied = 0;
-                    for dx in -1..2 {
-                        for dy in -1..2 {
-                            for dz in -1..2 {
-                                if dx | dy | dz == 0 {
-                                    continue;
+                        let mut occupied = 0;
+                        for dx in -1..2 {
+                            for dy in -1..2 {
+                                for dz in -1..2 {
+                                    for dw in -1..2 {
+                                        if dx | dy | dz | dw == 0 {
+                                            continue;
+                                        }
+                                        occupied +=
+                                            self.is_occupied(x + dx, y + dy, z + dz, w + dw);
+                                    }
                                 }
-                                occupied += self.is_occupied(x + dx, y + dy, z + dz);
                             }
                         }
-                    }
 
-                    if this_occupied == 1 && (occupied == 2 || occupied == 3) {
-                        new_active.insert(Cubes::get_index(x, y, z));
-                    }
-                    if this_occupied == 0 && occupied == 3 {
-                        new_active.insert(Cubes::get_index(x, y, z));
+                        if this_occupied == 1 && (occupied == 2 || occupied == 3) {
+                            new_active.insert(Cubes::get_index(x, y, z, w));
+                        }
+                        if this_occupied == 0 && occupied == 3 {
+                            new_active.insert(Cubes::get_index(x, y, z, w));
+                        }
                     }
                 }
             }
@@ -63,10 +68,10 @@ impl Cubes {
         Cubes { active: new_active }
     }
 
-    fn print(&self, z: i64, area: i64) {
+    fn print(&self, z: i64, w: i64, area: i64) {
         for y in -area..area + 1 {
             for x in -area..area + 1 {
-                if self.is_occupied(x, y, z) == 1 {
+                if self.is_occupied(x, y, z, w) == 1 {
                     print!("#")
                 } else {
                     print!(".")
@@ -90,7 +95,7 @@ fn read_input(reader: impl Read) -> Result<Cubes, String> {
     for line in lines {
         let mut ix = -(line.len() as i64) / 2;
         for c in line.chars() {
-            let index = Cubes::get_index(ix, iy, 0);
+            let index = Cubes::get_index(ix, iy, 0, 0);
 
             if let '#' = c {
                 println!("adding active {} {} @ {}", ix, iy, index);
@@ -144,31 +149,31 @@ mod tests {
 
         println!("{:?}", map.active);
 
-        assert_eq!(map.is_occupied(-1, -1, 0), 0);
-        assert_eq!(map.is_occupied(0, -1, 0), 1);
-        assert_eq!(map.is_occupied(1, -1, 0), 0);
+        assert_eq!(map.is_occupied(-1, -1, 0, 0), 0);
+        assert_eq!(map.is_occupied(0, -1, 0, 0), 1);
+        assert_eq!(map.is_occupied(1, -1, 0, 0), 0);
 
-        assert_eq!(map.is_occupied(-1, 0, 0), 0);
-        assert_eq!(map.is_occupied(0, 0, 0), 0);
-        assert_eq!(map.is_occupied(1, 0, 0), 1);
+        assert_eq!(map.is_occupied(-1, 0, 0, 0), 0);
+        assert_eq!(map.is_occupied(0, 0, 0, 0), 0);
+        assert_eq!(map.is_occupied(1, 0, 0, 0), 1);
 
-        assert_eq!(map.is_occupied(-1, 1, 0), 1);
-        assert_eq!(map.is_occupied(0, 1, 0), 1);
-        assert_eq!(map.is_occupied(1, 1, 0), 1);
+        assert_eq!(map.is_occupied(-1, 1, 0, 0), 1);
+        assert_eq!(map.is_occupied(0, 1, 0, 0), 1);
+        assert_eq!(map.is_occupied(1, 1, 0, 0), 1);
 
-        map.print(0, 1);
+        map.print(0, 0, 1);
     }
 
     #[test]
     fn test_apply_rules() {
         let mut map = read_input(get_test_data().as_bytes()).unwrap();
 
-        map.print(0, 1);
+        map.print(0, 1, 0);
 
         map = map.apply_rules(2);
 
-        map.print(-1, 2);
-        map.print(0, 2);
-        map.print(1, 2);
+        map.print(-1, -1, 2);
+        map.print(0, -1, 2);
+        map.print(1, -1, 2);
     }
 }
