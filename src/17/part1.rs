@@ -165,10 +165,10 @@ mod tests {
 
         map.print(0, 1);
 
-        map = map.apply_rules(2);
+        for i in 0..6 {
+            map = map.apply_rules(2 + i);
+        }
 
-        map.print(-1, 2);
-        map.print(0, 2);
-        map.print(1, 2);
+        assert_eq!(map.active.len(), 112);
     }
 }

@@ -168,12 +168,10 @@ mod tests {
     fn test_apply_rules() {
         let mut map = read_input(get_test_data().as_bytes()).unwrap();
 
-        map.print(0, 1, 0);
+        for i in 0..6 {
+            map = map.apply_rules(2 + i);
+        }
 
-        map = map.apply_rules(2);
-
-        map.print(-1, -1, 2);
-        map.print(0, -1, 2);
-        map.print(1, -1, 2);
+        assert_eq!(map.active.len(), 848);
     }
 }
