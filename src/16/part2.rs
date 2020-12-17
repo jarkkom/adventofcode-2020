@@ -13,6 +13,8 @@ fn open_input(filename: &str) -> io::Result<File> {
     File::open(path)
 }
 
+type Ticket = Vec<i64>;
+
 #[derive(PartialEq, Hash, Eq, Debug)]
 struct Rule {
     name: String,
@@ -38,7 +40,7 @@ fn parse_rule(rule: &str) -> Option<Rule> {
     None
 }
 
-fn read_input(reader: impl Read) -> Result<(Vec<Rule>, Vec<i64>, Vec<Vec<i64>>), String> {
+fn read_input(reader: impl Read) -> Result<(Vec<Rule>, Ticket, Vec<Ticket>), String> {
     let reader = BufReader::new(reader);
 
     let mut rules: Vec<Rule> = Vec::new();
@@ -85,7 +87,7 @@ fn read_input(reader: impl Read) -> Result<(Vec<Rule>, Vec<i64>, Vec<Vec<i64>>),
 
     let _x = lines_iter.next();
     let mut tickets: Vec<Vec<i64>> = Vec::new();
-    while let Some(line) = lines_iter.next() {
+    for line in lines_iter {
         match line {
             Ok(x) => {
                 if x.is_empty() {
@@ -104,7 +106,7 @@ fn read_input(reader: impl Read) -> Result<(Vec<Rule>, Vec<i64>, Vec<Vec<i64>>),
     Ok((rules, own_tickets[0].to_vec(), tickets))
 }
 
-fn validate_ticket(ticket: &Vec<i64>, rules: &Vec<Rule>) -> Option<i64> {
+fn validate_ticket(ticket: &Ticket, rules: &[Rule]) -> Option<i64> {
     for &t in ticket {
         let mut valid_rules = 0;
         for r in rules {
@@ -121,7 +123,7 @@ fn validate_ticket(ticket: &Vec<i64>, rules: &Vec<Rule>) -> Option<i64> {
     None
 }
 
-fn find_rule_columns(rules: Vec<Rule>, tickets: Vec<&Vec<i64>>) -> HashMap<String, usize> {
+fn find_rule_columns(rules: Vec<Rule>, tickets: Vec<&Ticket>) -> HashMap<String, usize> {
     let mut valid_columns_per_rule: HashMap<&Rule, Vec<usize>> = HashMap::new();
 
     for r in rules.iter() {
@@ -190,9 +192,9 @@ fn main() {
 
     println!("tickets {:?}", tickets);
 
-    let validated_tickets: Vec<&Vec<i64>> = tickets
+    let validated_tickets: Vec<&Ticket> = tickets
         .iter()
-        .filter(|t| validate_ticket(&t, &rules).is_none())
+        .filter(|t| validate_ticket(t, &rules).is_none())
         .collect();
 
     println!("validated_tickets {:?}", validated_tickets);

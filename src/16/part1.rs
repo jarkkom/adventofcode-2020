@@ -12,6 +12,8 @@ fn open_input(filename: &str) -> io::Result<File> {
     File::open(path)
 }
 
+type Ticket = Vec<i64>;
+
 #[derive(PartialEq, Debug)]
 struct Rule {
     name: String,
@@ -37,59 +39,7 @@ fn parse_rule(rule: &str) -> Option<Rule> {
     None
 }
 
-fn read_rules(reader: impl Read) -> Result<Vec<Rule>, String> {
-    let reader = BufReader::new(reader);
-
-    let mut rules: Vec<Rule> = Vec::new();
-
-    for line_iter in reader.lines() {
-        match line_iter {
-            Ok(x) => {
-                if x.is_empty() {
-                    break;
-                }
-
-                let rule = parse_rule(&x).unwrap();
-                rules.push(rule);
-            }
-            Err(x) => {
-                return Err(format!("cannot read input: {:?}", x));
-            }
-        }
-    }
-
-    Ok(rules)
-}
-
-fn read_tickets(reader: impl Read) -> Result<Vec<Vec<i64>>, String> {
-    let reader = BufReader::new(reader);
-
-    let mut iter = reader.lines();
-    iter.next();
-
-    let mut tickets: Vec<Vec<i64>> = Vec::new();
-
-    for line_iter in iter {
-        match line_iter {
-            Ok(x) => {
-                if x.is_empty() {
-                    break;
-                }
-
-                tickets.push(x.split(',').map(|x| x.parse().unwrap()).collect());
-
-                println!("{:?}", x);
-            }
-            Err(x) => {
-                return Err(format!("cannot read input: {:?}", x));
-            }
-        }
-    }
-
-    Ok(tickets)
-}
-
-fn read_input(reader: impl Read) -> Result<(Vec<Rule>, Vec<i64>, Vec<Vec<i64>>), String> {
+fn read_input(reader: impl Read) -> Result<(Vec<Rule>, Ticket, Vec<Ticket>), String> {
     let reader = BufReader::new(reader);
 
     let mut rules: Vec<Rule> = Vec::new();
@@ -136,30 +86,26 @@ fn read_input(reader: impl Read) -> Result<(Vec<Rule>, Vec<i64>, Vec<Vec<i64>>),
 
     let _x = lines_iter.next();
     let mut tickets: Vec<Vec<i64>> = Vec::new();
-    loop {
-        if let Some(line) = lines_iter.next() {
-            match line {
-                Ok(x) => {
-                    if x.is_empty() {
-                        break;
-                    }
-
-                    tickets.push(x.split(',').map(|x| x.parse().unwrap()).collect());
-
-                    println!("{:?}", x);
+    for line in lines_iter {
+        match line {
+            Ok(x) => {
+                if x.is_empty() {
+                    break;
                 }
-                Err(x) => {
-                    return Err(format!("cannot read input: {:?}", x));
-                }
+
+                tickets.push(x.split(',').map(|x| x.parse().unwrap()).collect());
+
+                println!("{:?}", x);
             }
-        } else {
-            break;
+            Err(x) => {
+                return Err(format!("cannot read input: {:?}", x));
+            }
         }
     }
     Ok((rules, own_tickets[0].to_vec(), tickets))
 }
 
-fn validate_ticket(ticket: &Vec<i64>, rules: &Vec<Rule>) -> Option<i64> {
+fn validate_ticket(ticket: &Ticket, rules: &[Rule]) -> Option<i64> {
     for &t in ticket {
         let mut valid_rules = 0;
         for r in rules {
@@ -191,10 +137,8 @@ fn main() {
 
     println!("tickets {:?}", tickets);
 
-    let validated_tickets: Vec<Option<i64>> = tickets
-        .iter()
-        .map(|t| validate_ticket(&t, &rules))
-        .collect();
+    let validated_tickets: Vec<Option<i64>> =
+        tickets.iter().map(|t| validate_ticket(t, &rules)).collect();
     println!("validated_tickets {:?}", validated_tickets);
 
     println!("answer {:?}", calculate_error_rate(validated_tickets));
@@ -220,7 +164,7 @@ nearby tickets:
 38,6,12"
             .as_bytes();
 
-        let rules = read_rules(test_input).unwrap();
+        let (rules, _my_ticket, _tickets) = read_input(test_input).unwrap();
         println!("{:?}", rules);
         assert_eq!(rules.len(), 3);
         assert_eq!(
@@ -251,22 +195,24 @@ nearby tickets:
 
     #[test]
     fn test_read_tickets() {
-        let test_input_1 = "your ticket:
+        let test_input = "class: 1-3 or 5-7
+row: 6-11 or 33-44
+seat: 13-40 or 45-50
+
+your ticket:
 7,1,14
 
-";
-        let test_input_2 = "nearby tickets:
+nearby tickets:
 7,3,47
 40,4,50
 55,2,20
-38,6,12";
+38,6,12"
+            .as_bytes();
+        let (_, actual_1, actual_2) = read_input(test_input).unwrap();
 
-        let actual_1 = read_tickets(test_input_1.as_bytes()).unwrap();
         println!("{:?}", actual_1);
-        assert_eq!(actual_1.len(), 1);
-        assert_eq!(actual_1[0], vec![7, 1, 14]);
+        assert_eq!(actual_1, vec![7, 1, 14]);
 
-        let actual_2 = read_tickets(test_input_2.as_bytes()).unwrap();
         println!("{:?}", actual_2);
         assert_eq!(actual_2.len(), 4);
         assert_eq!(actual_2[0], vec![7, 3, 47]);
@@ -277,18 +223,21 @@ nearby tickets:
 
     #[test]
     fn test_validate_tickets() {
-        let test_rule_input = "class: 1-3 or 5-7
+        let test_input = "class: 1-3 or 5-7
 row: 6-11 or 33-44
 seat: 13-40 or 45-50
-";
-        let test_input_tickets = "nearby tickets:
+
+your ticket:
+7,1,14
+
+nearby tickets:
 7,3,47
 40,4,50
 55,2,20
-38,6,12";
+38,6,12"
+            .as_bytes();
 
-        let rules = read_rules(test_rule_input.as_bytes()).unwrap();
-        let tickets = read_tickets(test_input_tickets.as_bytes()).unwrap();
+        let (rules, _, tickets) = read_input(test_input).unwrap();
 
         assert_eq!(validate_ticket(&tickets[0], &rules), None);
         assert_eq!(validate_ticket(&tickets[1], &rules), Some(4));

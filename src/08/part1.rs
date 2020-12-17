@@ -81,7 +81,7 @@ impl CPU {
                 panic!("unknown instruction");
             }
         }
-        return self.ip;
+        self.ip
     }
 }
 
