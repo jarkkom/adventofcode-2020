@@ -38,7 +38,7 @@ fn parse_lines(line: String) -> Vec<(i64, i64)> {
         .collect()
 }
 
-fn find_earliest(lines: &Vec<(i64, i64)>) -> i64 {
+fn find_earliest(lines: &[(i64, i64)]) -> i64 {
     let mut t = 0;
 
     // start stepping by using first line

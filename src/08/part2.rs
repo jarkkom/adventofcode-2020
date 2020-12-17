@@ -81,7 +81,7 @@ impl CPU {
                 panic!("unknown instruction");
             }
         }
-        return self.ip;
+        self.ip
     }
 }
 
@@ -123,7 +123,7 @@ fn main() {
             if op.instr == "nop" || op.instr == "jmp" {
                 Some(idx)
             } else {
-                return None;
+                None
             }
         })
         .collect();
