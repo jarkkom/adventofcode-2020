@@ -126,54 +126,52 @@ fn validate_ticket(ticket: &Ticket, rules: &[Rule]) -> Option<i64> {
 fn find_rule_columns(rules: Vec<Rule>, tickets: Vec<&Ticket>) -> HashMap<String, usize> {
     let mut valid_columns_per_rule: HashMap<&Rule, Vec<usize>> = HashMap::new();
 
-    for r in rules.iter() {
+    let num_columns = tickets[0].len();
+
+    rules.iter().for_each(|r| {
         let mut valid_columns = Vec::new();
-        for i in 0..tickets[0].len() {
-            let mut is_column_valid = true;
-            for (_row, ticket) in tickets.iter().enumerate() {
+        // check all ticket columns
+        for i in 0..num_columns {
+            // if all values satisfy this rule, add column to the list
+            if tickets.iter().all(|ticket| {
                 let t = ticket[i];
-                if !(t >= r.range1.0 && t <= r.range1.1) && !(t >= r.range2.0 && t <= r.range2.1) {
-                    //println!("column {} not val {} valid {:?} @ row {}", i, t, r, row);
-                    is_column_valid = false;
-                } else {
-                    //println!("column {}     val {} valid {:?} @ row {}", i, t, r, row);
-                }
-            }
-            if is_column_valid {
+                (t >= r.range1.0 && t <= r.range1.1) || (t >= r.range2.0 && t <= r.range2.1)
+            }) {
                 valid_columns.push(i);
             }
         }
         println!("rule {:?} has valid columns {:?}", r, valid_columns);
         valid_columns_per_rule.insert(&r, valid_columns);
-    }
+    });
 
     let mut rule_to_column: HashMap<String, usize> = HashMap::new();
 
-    for _i in 0..rules.len() {
-        let smallest = valid_columns_per_rule
-            .iter()
-            .filter(|(_k, v)| !v.is_empty())
-            .min_by_key(|(_k, v)| v.len())
-            .unwrap();
-
+    // go through rules and find rule with least valid columns
+    while let Some(smallest) = valid_columns_per_rule
+        .iter()
+        .filter(|(_k, v)| !v.is_empty())
+        .min_by_key(|(_k, v)| v.len())
+    {
         println!("smallest rule {:?}", smallest);
         let smallest_column = smallest.1[0];
 
+        // and map that rule to column id
         rule_to_column.insert(smallest.0.name.to_owned(), smallest_column);
 
-        for r in valid_columns_per_rule.values_mut() {
-            if r.is_empty() {
-                continue;
-            }
-            let column_to_remove = r
-                .iter()
-                .enumerate()
-                .find(|(_i, &v)| v == smallest_column)
-                .map(|(i, _v)| i);
-            if let Some(x) = column_to_remove {
-                r.remove(x);
-            }
-        }
+        // remove this rule from the list
+        valid_columns_per_rule
+            .values_mut()
+            .filter(|r| !r.is_empty())
+            .for_each(|r| {
+                let column_to_remove = r
+                    .iter()
+                    .enumerate()
+                    .find(|(_i, &v)| v == smallest_column)
+                    .map(|(i, _v)| i);
+                if let Some(x) = column_to_remove {
+                    r.remove(x);
+                }
+            });
     }
 
     rule_to_column
@@ -205,7 +203,6 @@ fn main() {
 
     let answer: i64 = mapping
         .iter()
-        .inspect(|(_k, &v)| println!("{:?} {:?}", _k, v))
         .filter(|(k, _v)| k.starts_with("departure"))
         .map(|(_k, &v)| {
             println!("{:?} {:?}", _k, v);
