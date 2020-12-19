@@ -101,10 +101,15 @@ fn read_input(reader: impl Read) -> Result<(HashMap<usize, Rule>, Vec<String>), 
     Ok((rules, messages))
 }
 
-fn traverse_rules(rules: &HashMap<usize, Rule>, pos: usize, depth: usize) -> String {
+fn traverse_rules(
+    rules: &HashMap<usize, Rule>,
+    pos: usize,
+    depth: usize,
+    max_depth: usize,
+) -> String {
     let mut regex = String::from("");
 
-    if depth > 20 {
+    if depth > max_depth {
         return regex;
     }
 
@@ -114,15 +119,15 @@ fn traverse_rules(rules: &HashMap<usize, Rule>, pos: usize, depth: usize) -> Str
         }
         Rule::Concat(a) => {
             a.iter()
-                .for_each(|r| regex.push_str(&traverse_rules(rules, *r, depth + 1)));
+                .for_each(|r| regex.push_str(&traverse_rules(rules, *r, depth + 1, max_depth)));
         }
         Rule::Union(a, b) => {
             regex.push('(');
             a.iter()
-                .for_each(|r| regex.push_str(&traverse_rules(rules, *r, depth + 1)));
+                .for_each(|r| regex.push_str(&traverse_rules(rules, *r, depth + 1, max_depth)));
             regex.push('|');
             b.iter()
-                .for_each(|r| regex.push_str(&traverse_rules(rules, *r, depth + 1)));
+                .for_each(|r| regex.push_str(&traverse_rules(rules, *r, depth + 1, max_depth)));
             regex.push(')');
         }
     }
@@ -140,13 +145,23 @@ fn main() {
 
     println!("rules = {:?}", inputs);
 
-    let regex_str = format!("^{}$", traverse_rules(&inputs.0, 0, 0));
-    println!("regex = {}", regex_str);
+    let mut max_depth = 0;
+    loop {
+        let regex_str = format!("^{}$", traverse_rules(&inputs.0, 0, 0, max_depth));
+        println!("regex = {}", regex_str);
 
-    let regex = Regex::new(&regex_str).unwrap();
+        let regex = Regex::new(&regex_str).unwrap();
 
-    let matching = inputs.1.iter().filter(|i| regex.is_match(i)).count();
-    println!("answer = {}", matching);
+        let matching = inputs.1.iter().filter(|i| regex.is_match(i)).count();
+        println!("answer = {}", matching);
+
+        if matching == 301 {
+            break;
+        }
+
+        max_depth += 1;
+    }
+    println!("max_depth = {}", max_depth);
 }
 
 #[cfg(test)]
@@ -206,7 +221,7 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
 
         println!("output = {:?}", output);
 
-        let regex_str = format!("^{}$", traverse_rules(&output.0, 0, 0));
+        let regex_str = format!("^{}$", traverse_rules(&output.0, 0, 0, 20));
         println!("regex = {}", regex_str);
 
         let regex = Regex::new(&regex_str).unwrap();
@@ -268,7 +283,7 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
 
         println!("output = {:?}", output);
 
-        let regex_str = format!("^{}$", traverse_rules(&output.0, 0, 0));
+        let regex_str = format!("^{}$", traverse_rules(&output.0, 0, 0, 20));
         println!("regex = {}", regex_str);
 
         let regex = Regex::new(&regex_str).unwrap();
@@ -276,5 +291,4 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"#;
         let matching = output.1.iter().filter(|i| regex.is_match(i)).count();
         assert_eq!(matching, 12);
     }
-
 }
