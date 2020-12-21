@@ -51,11 +51,10 @@ fn read_input(reader: impl Read) -> Result<HashMap<String, Vec<String>>, String>
             Ok(x) => {
                 let (outer, inner) = parse_rule(&x).unwrap();
                 for i in inner {
-                    if let Some(x) = rules.get_mut(i) {
-                        x.push(outer.to_owned());
-                    } else {
-                        rules.insert(i.to_owned(), vec![outer.to_owned()]);
-                    }
+                    rules
+                        .entry(i.to_owned())
+                        .and_modify(|a| a.push(outer.to_owned()))
+                        .or_insert(vec![outer.to_owned()]);
                 }
             }
             Err(x) => {

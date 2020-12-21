@@ -38,7 +38,10 @@ fn read_input(reader: impl Read) -> Result<Vec<Group>, String> {
                     curr_people = 0;
                 } else {
                     for c in x.chars() {
-                        curr_group_answers.insert(c, curr_group_answers.get(&c).unwrap_or(&0) + 1);
+                        curr_group_answers
+                            .entry(c)
+                            .and_modify(|c| *c += 1)
+                            .or_insert(1);
                     }
                     curr_people += 1;
                 }
