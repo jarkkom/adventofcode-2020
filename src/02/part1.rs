@@ -6,8 +6,8 @@ use std::io::BufReader;
 use std::path::Path;
 
 struct Input {
-    min: i64,
-    max: i64,
+    min: usize,
+    max: usize,
     letter: char,
     password: String,
 }
@@ -26,8 +26,8 @@ fn read_input(filename: &str) -> Result<Vec<Input>, String> {
                 let capture_iter = re.captures_iter(x.as_str());
                 for m in capture_iter {
                     let i = Input {
-                        min: m[1].parse::<i64>().unwrap(),
-                        max: m[2].parse::<i64>().unwrap(),
+                        min: m[1].parse::<usize>().unwrap(),
+                        max: m[2].parse::<usize>().unwrap(),
                         letter: m[3].chars().next().unwrap(),
                         password: m[4].to_owned(),
                     };
@@ -47,12 +47,7 @@ fn read_input(filename: &str) -> Result<Vec<Input>, String> {
 fn validate_inputs(inputs: &[Input]) -> i64 {
     let mut valids = 0;
     for i in inputs.iter() {
-        let mut count: i64 = 0;
-        for c in i.password.chars() {
-            if c == i.letter {
-                count += 1;
-            }
-        }
+        let count = i.password.chars().filter(|&c| c == i.letter).count();
         if count >= i.min && count <= i.max {
             valids += 1;
         }
