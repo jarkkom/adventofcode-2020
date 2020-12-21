@@ -108,7 +108,7 @@ fn find_allergens(candidates: &HashMap<String, Vec<Vec<String>>>) -> HashMap<Str
         if allergens.len() == candidates.len() {
             break;
         }
-    };
+    }
 
     allergens
 }
@@ -134,7 +134,16 @@ fn main() {
     let answer = foods.iter().fold(0, |a, f| {
         a + f.0.iter().filter(|&i| !allergens.contains_key(i)).count()
     });
-    println!("answer {:?}", answer);
+    println!("part 1 answer {:?}", answer);
+
+    let mut dangerous: Vec<(&String, &String)> = allergens.iter().collect();
+    dangerous.sort_unstable_by_key(|(_, v)| v.to_owned());
+
+    let sorted: Vec<String> = dangerous.iter().map(|&(a, _)| a.to_owned()).collect();
+
+    let answer_2 = sorted.join(",");
+
+    println!("part 2 answer {}", answer_2);
 }
 
 #[cfg(test)]
@@ -185,6 +194,30 @@ mod tests {
             a + f.0.iter().filter(|&i| !allergens.contains_key(i)).count()
         });
         assert_eq!(answer, 5);
+    }
+
+    #[test]
+    fn test_dangerous_ingredients() {
+        let foods = read_input(get_test_input().as_bytes()).unwrap();
+        println!("{:?}", foods);
+
+        let candidates = map_candidates(foods.clone());
+
+        let allergens = find_allergens(&candidates);
+
+        println!("allergens {:?}", allergens);
+
+        assert_eq!(allergens["mxmxvkd"], "dairy");
+        assert_eq!(allergens["sqjhc"], "fish");
+        assert_eq!(allergens["fvjkl"], "soy");
+
+        let mut dangerous: Vec<(&String, &String)> = allergens.iter().collect();
+        dangerous.sort_unstable_by_key(|(_, v)| v.to_owned());
+
+        let sorted: Vec<String> = dangerous.iter().map(|&(a, _)| a.to_owned()).collect();
+
+        let answer_2 = sorted.join(",");
+        assert_eq!(answer_2, "mxmxvkd,sqjhc,fvjkl");
     }
 
     fn get_test_input() -> String {
