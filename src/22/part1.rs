@@ -64,15 +64,12 @@ struct Game {
 
 impl Game {
     fn new(stack_1: VecDeque<i64>, stack_2: VecDeque<i64>) -> Game {
-        Game{
-            stack_1,
-            stack_2,
-        }
+        Game { stack_1, stack_2 }
     }
 
     fn play_round(&mut self) {
         let n1 = self.stack_1.pop_front().unwrap();
-        let n2 = self.stack_2.pop_front().unwrap();        
+        let n2 = self.stack_2.pop_front().unwrap();
 
         if n1 > n2 {
             self.stack_1.push_back(n1);
@@ -96,7 +93,11 @@ impl Game {
             full_stack = &self.stack_1;
         }
 
-        full_stack.iter().rev().enumerate().fold(0, |total, (i, card)| total + (i + 1) as i64 * card)
+        full_stack
+            .iter()
+            .rev()
+            .enumerate()
+            .fold(0, |total, (i, card)| total + (i + 1) as i64 * card)
     }
 }
 
@@ -163,8 +164,9 @@ mod tests {
         assert_eq!(score, 306);
     }
 
-     fn get_test_input() -> String {
-         String::from("Player 1:
+    fn get_test_input() -> String {
+        String::from(
+            "Player 1:
 9
 2
 6
@@ -176,6 +178,7 @@ Player 2:
 8
 4
 7
-10")
-     }
+10",
+        )
+    }
 }
