@@ -186,5 +186,9 @@ name = "24-01"
 path = "src/24/part1.rs"
 
 [[bin]]
+name = "24-02"
+path = "src/24/part2.rs"
+
+[[bin]]
 name = "25-01"
 path = "src/25/part1.rs"

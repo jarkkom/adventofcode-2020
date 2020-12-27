@@ -59,6 +59,64 @@ fn parse_moves(s: String) -> Vec<Move> {
     moves
 }
 
+fn get_neighbors(m: &Move) -> Vec<Move> {
+    let offsets = vec![
+        (-1, 0, 1),
+        (1, 0, -1),
+        (-1, 1, 0),
+        (0, 1, -1),
+        (0, -1, 1),
+        (1, -1, 0),
+    ];
+
+    let mut n = Vec::new();
+    for o in offsets {
+        n.push((m.0 + o.0, m.1 + o.1, m.2 + o.2));
+    }
+    n
+}
+
+fn run_day(blacks: &HashSet<Move>) -> HashSet<Move> {
+    let mut res_blacks: HashSet<Move> = HashSet::new();
+
+    // all potential tiles to consider
+    let mut all_tiles: HashSet<Move> = HashSet::new();
+
+    for b in blacks {
+        all_tiles.insert(b.clone());
+        for n in get_neighbors(b) {
+            all_tiles.insert(n.clone());
+        }
+    }
+
+    for t in all_tiles {
+        let neighbors = get_neighbors(&t);
+
+        let mut black_neighbors = 0;
+        for n in neighbors {
+            if blacks.contains(&n) {
+                black_neighbors += 1;
+            }
+        }
+
+        //println!("checking {:?} is_black {:?} black_neigbors {:?}", t, blacks.contains(&t), black_neighbors);
+
+        if blacks.contains(&t) {
+            // Any black tile with zero or more than 2 black tiles immediately adjacent to it is flipped to white.
+            if black_neighbors == 1 || black_neighbors == 2 {
+                res_blacks.insert(t);
+            }
+        } else {
+            // Any white tile with exactly 2 black tiles immediately adjacent to it is flipped to black.
+            if black_neighbors == 2 {
+                res_blacks.insert(t);
+            }
+        }
+    }
+
+    res_blacks
+}
+
 type Move = (i64, i64, i64);
 
 fn main() {
@@ -91,7 +149,13 @@ fn main() {
         }
     }
 
-    println!("count = {}", flipped.len());
+    let mut day = 0;
+    while day < 100 {
+        flipped = run_day(&flipped);
+        println!("Day {}: {}", day, flipped.len());
+
+        day += 1;
+    }
 }
 
 #[cfg(test)]
@@ -99,11 +163,43 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_read_rules() {
+    fn test_read_moves() {
         let test_input = get_test_input();
 
         let moves = read_input(test_input.as_bytes()).unwrap();
         println!("moves {:?}", moves);
+    }
+
+    #[test]
+    fn test_run_day() {
+        let moves_list = read_input(get_test_input().as_bytes()).unwrap();
+        let mut black_tiles: HashSet<Move> = HashSet::new();
+        for moves in moves_list {
+            let mut x = 0;
+            let mut y = 0;
+            let mut z = 0;
+            for m in moves {
+                x += m.0;
+                y += m.1;
+                z += m.2;
+            }
+            if black_tiles.contains(&(x, y, z)) {
+                black_tiles.remove(&(x, y, z));
+            } else {
+                black_tiles.insert((x, y, z));
+            }
+        }
+
+        assert_eq!(black_tiles.len(), 10);
+
+        black_tiles = run_day(&black_tiles);
+        assert_eq!(black_tiles.len(), 15);
+
+        black_tiles = run_day(&black_tiles);
+        assert_eq!(black_tiles.len(), 12);
+
+        black_tiles = run_day(&black_tiles);
+        assert_eq!(black_tiles.len(), 25);
     }
 
     fn get_test_input() -> String {
